@@ -58,7 +58,7 @@ export function useZoomGesture(props: UseZoomGestureProps = {}): {
   const panStartOffsetX = useSharedValue(0)
   const panStartOffsetY = useSharedValue(0)
 
-  const handlePanOutsideTimeoutId: React.MutableRefObject<number | undefined> = useRef()
+  const handlePanOutsideTimeoutId: React.MutableRefObject<NodeJS.Timeout | undefined> = useRef()
 
   const withAnimation = useCallback((toValue: number, config?: object) => {
     'worklet'
@@ -286,7 +286,7 @@ export function useZoomGesture(props: UseZoomGestureProps = {}): {
         runOnJS(handlePanOutside)()
       })
       .onTouchesMove((e: GestureTouchEvent, state: GestureStateManagerType): void => {
-        if ([State.UNDETERMINED, State.BEGAN].includes(e.state))
+        if (e.state === State.UNDETERMINED || e.state === State.BEGAN)
           if (isZoomedIn.value || e.numberOfTouches === 2)
             state.activate()
           else
@@ -340,6 +340,7 @@ export function useZoomGesture(props: UseZoomGestureProps = {}): {
   }))
 
   return ({
+    // @ts-ignore
     zoomGesture,
     contentContainerAnimatedStyle,
     onLayout,
@@ -368,6 +369,7 @@ export default function Zoom(props: PropsWithChildren<ZoomProps>): React.ReactNo
   })
 
   return (
+    // @ts-ignore
     <GestureDetector gesture={zoomGesture}>
       <View
         style={[styles.container, style]}
